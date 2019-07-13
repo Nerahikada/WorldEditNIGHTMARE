@@ -3,6 +3,7 @@
 namespace edit;
 
 use pocketmine\block\Block;
+use pocketmine\block\Fallable;
 use pocketmine\level\Level;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
@@ -228,7 +229,8 @@ class EditSession implements Extent{
 			$this->reorder[] = [$pt, $pattern];
 			return true;
 		}
-		$this->player->getLevel()->setBlock($pt->toVector3(), Block::get($pattern->getType(), $pattern->getData()), false, false);
+		$block = Block::get($pattern->getType(), $pattern->getData());
+		$this->player->getLevel()->setBlock($pt->toVector3(), $block, false, $block instanceof Fallable);
 		return true;
 	}
 
