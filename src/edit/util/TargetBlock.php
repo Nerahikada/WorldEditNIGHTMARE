@@ -46,7 +46,7 @@ class TargetBlock{
 		$searchForLastBlock = true;
 		$lastBlock = null;
 		while($this->getNextBlock() != null){
-			if($this->world->getBlock($this->getCurrentBlock()->toVector3())->getId() == Block::AIR){
+			if($this->world->getBlock($this->getCurrentBlock()->toVector3(), true, false)->getId() == Block::AIR){
 				if($searchForLastBlock){
 					$lastBlock = $this->getCurrentBlock();
 					if($lastBlock->getBlockY() <= 0 || $lastBlock->getBlockY() >= 255){
@@ -62,12 +62,12 @@ class TargetBlock{
 	}
 
 	public function getTargetBlock() : ?BlockWorldVector{
-		while($this->getNextBlock() != null && $this->world->getBlock($this->getCurrentBlock()->toVector3())->getId() == Block::AIR);
+		while($this->getNextBlock() != null && $this->world->getBlock($this->getCurrentBlock()->toVector3(), true, false)->getId() == Block::AIR);
 		return $this->getCurrentBlock;
 	}
 
 	public function getSolidTargetBlock() : ?BlockWorldVector{
-		while($this->getNextBlock() != null && $this->world->getBlock($this->getCurrentBlock()->toVector3())->canPassThrough());
+		while($this->getNextBlock() != null && $this->world->getBlock($this->getCurrentBlock()->toVector3(), true, false)->canPassThrough());
 		return $this->getCurrentBlock;
 	}
 

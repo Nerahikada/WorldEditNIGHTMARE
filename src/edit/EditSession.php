@@ -89,7 +89,7 @@ class EditSession implements Extent{
 	}
 
 	public function getBlock(Vector $pt) : BaseBlock{
-		$block = $this->player->getLevel()->getBlock(new Vector3($pt->getX(), $pt->getY(), $pt->getZ()));
+		$block = $this->player->getLevel()->getBlock(new Vector3($pt->getX(), $pt->getY(), $pt->getZ()), true, false);
 		return new BaseBlock($block->getId(), $block->getDamage());
 	}
 
@@ -199,7 +199,7 @@ class EditSession implements Extent{
 
 	public function reorderUndo(){
 		foreach($this->reorderUndo as $o){
-			$this->player->getLevel()->setBlock($o[0]->toVector3(), Block::get($o[1]->getType(), $o[1]->getData()));
+			$this->player->getLevel()->setBlock($o[0]->toVector3(), Block::get($o[1]->getType(), $o[1]->getData()), false, false);
 		}
 		$this->reorderUndo = [];
 	}
@@ -209,13 +209,13 @@ class EditSession implements Extent{
 			$this->reorderUndo[] = [$pt, $block];
 			return true;
 		}
-		$this->player->getLevel()->setBlock($pt->toVector3(), Block::get($block->getType(), $block->getData()));
+		$this->player->getLevel()->setBlock($pt->toVector3(), Block::get($block->getType(), $block->getData()), false, false);
 		return true;
 	}
 
 	public function reorder(){
 		foreach($this->reorder as $o){
-			$this->player->getLevel()->setBlock($o[0]->toVector3(), Block::get($o[1]->getType(), $o[1]->getData()));
+			$this->player->getLevel()->setBlock($o[0]->toVector3(), Block::get($o[1]->getType(), $o[1]->getData()), false, false);
 		}
 		$this->reorder = [];
 	}
@@ -228,7 +228,7 @@ class EditSession implements Extent{
 			$this->reorder[] = [$pt, $pattern];
 			return true;
 		}
-		$this->player->getLevel()->setBlock($pt->toVector3(), Block::get($pattern->getType(), $pattern->getData()));
+		$this->player->getLevel()->setBlock($pt->toVector3(), Block::get($pattern->getType(), $pattern->getData()), false, false);
 		return true;
 	}
 
