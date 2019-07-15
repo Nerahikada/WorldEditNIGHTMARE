@@ -42,14 +42,7 @@ class ExtentEntityCopy implements EntityFunction{
 	}
 
 	public function apply(Entity $entity) : bool{
-		$location = new Location($this->destination, new Vector($entity->x, $entity->y, $entity->z), $entity->getYaw(), $entity->getPitch());
-		$pivot = $this->from->round()->add(0.5, 0.5, 0.5);
-
-		$newPosition = $this->transform->apply($location->toVector()->subtract($pivot));
-		$newDirection = $this->transform->isIdentity() ?
-			$location->getDirection()
-			: $this->transform->apply($location->getDirection())->subtract($this->transform->apply(new Vector(0, 0, 0)))->normalize();
-		$newLocation = new Location($this->destination, $newPosition->add($this->to->round()->add(0.5, 0.5, 0.5)), $newDirection->toYaw(), $newDirection->toPitch());
+		$newLocation = new Location($this->destination, $this->to, $entity->getYaw(), $entity->getPitch());
 
 		$entity = $this->transformNbtData($entity);
 
