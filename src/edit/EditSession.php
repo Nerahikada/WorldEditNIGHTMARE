@@ -151,7 +151,7 @@ class EditSession implements Extent{
 		Utils::setPrivateValue($newEntity, "hasSpawned", []);
 		Utils::setPrivateValue($newEntity, "id", Entity::$entityCount++);
 		Utils::setPrivateValue($newEntity, "uuid", UUID::fromRandom());
-		$newEntity->teleport($location->toVector(), $location->getYaw(), $location->getPitch());
+		$newEntity->teleport($location->toVector()->toVector3(), $location->getYaw(), $location->getPitch());
 
 		$newEntity->spawnToAll();
 		$this->changeMemory->add(new EntityCreate($location, $newEntity));
