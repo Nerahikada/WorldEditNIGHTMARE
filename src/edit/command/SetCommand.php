@@ -59,7 +59,6 @@ class SetCommand extends VanillaCommand{
 		$session = Main::getInstance()->getEditSession($sender);
 
 		$affected = $session->setBlocks($session->getRegionSelector($sender->getLevel())->getRegion()->iterator(), $pattern);
-		echo($affected);
 		$session->remember();
 		$sender->sendMessage(Main::LOGO.$affected."ブロックを設置しました");
 		Main::getInstance()->getServer()->broadcastMessage("§7".Main::LOGO.$sender->getName()." が /".$this->getName()." を利用");
