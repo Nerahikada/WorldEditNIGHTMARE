@@ -5,6 +5,7 @@ namespace edit;
 use pocketmine\block\Block;
 use pocketmine\block\Fallable;
 use pocketmine\level\Level;
+use pocketmine\level\Position;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
 use pocketmine\entity\Entity;
@@ -145,13 +146,18 @@ class EditSession implements Extent{
 			return null;
 		}
 
+		$level = $this->player->getLevel();
 		$newEntity = clone $entity;
-		$newEntity->random = new Random($this->player->getLevel()->random->nextInt());
+		$newEntity->random = new Random($level->random->nextInt());
 		Utils::setPrivateValue($newEntity, "timings", Timings::getEntityTimings($newEntity));
 		Utils::setPrivateValue($newEntity, "hasSpawned", []);
 		Utils::setPrivateValue($newEntity, "id", Entity::$entityCount++);
 		Utils::setPrivateValue($newEntity, "uuid", UUID::fromRandom());
-		$newEntity->teleport($location->toVector()->toVector3(), $location->getYaw(), $location->getPitch());
+		$newEntity->teleport(new Position($location->getX(), $location->getY(), $location->getZ(), $level), $location->getYaw(), $location->getPitch());
+		$newEntity->chunk = $level->getChunkAtPosition($newEntity, false);
+		$newEntity->chunk->addEntity($newEntity);
+		$level->addEntity($newEntity);
+		$newEntity->scheduleUpdate();
 
 		$newEntity->spawnToAll();
 		$this->changeMemory->add(new EntityCreate($location, $newEntity));
