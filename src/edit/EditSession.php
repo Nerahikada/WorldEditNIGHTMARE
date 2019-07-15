@@ -8,11 +8,9 @@ use pocketmine\level\Level;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
 use pocketmine\entity\Entity;
-use pocketmine\nbt\tag\CompoundTag;
-use pocketmine\nbt\tag\DoubleTag;
-use pocketmine\nbt\tag\FloatTag;
-use pocketmine\nbt\tag\ListTag;
-use pocketmine\nbt\tag\StringTag;
+use pocketmine\timings\Timings;
+use pocketmine\utils\Random;
+use pocketmine\utils\UUID;
 
 use edit\blocks\BaseBlock;
 use edit\blocks\BlockType;
@@ -45,6 +43,7 @@ use edit\regions\RegionSelector;
 use edit\regions\Region;
 use edit\session\ClipboardHolder;
 use edit\util\Location;
+use edit\util\Utils;
 
 class EditSession implements Extent{
 
@@ -142,42 +141,16 @@ class EditSession implements Extent{
 	}
 
 	public function createEntity(Location $location, Entity $entity) : ?Entity{
-		$skin = $entity->getSkin();
-		$nbt = new CompoundTag("", [
-			new ListTag("Pos", [
-				new DoubleTag("", $location->getX()),
-				new DoubleTag("", $location->getY()),
-				new DoubleTag("", $location->getZ())
-			]),
-			new ListTag("Motion", [
-				new DoubleTag("", 0),
-				new DoubleTag("", 0),
-				new DoubleTag("", 0)
-			]),
-			new ListTag("Rotation", [
-				new FloatTag("", $location->getYaw()),
-				new FloatTag("", $location->getPitch())
-			]),
-			"Skin" => new CompoundTag("Skin", [
-				new StringTag("geometryData", $skin->getGeometryData()),
-				new StringTag("geometryName", $skin->getGeometryName()),
-				new StringTag("capeData", $skin->getCapeData()),
-				new StringTag("Data", $skin->getSkinData()),
-				new StringTag("Name", $skin->getSkinId())
-			]),
-		]);
+		if($entity instanceof Player){
+			return null;
+		}
+		
+		$newEntity = clone $entity;
+		$newEntity->random = new Random($level->random->nextInt());
+		Utils::setPrivateValue($newEntity, "timings", Timings::getEntityTimings($newEntity));
+		Utils::setPrivateValue($newEntity, "id", Entity::$entityCount++);
+		Utils::setPrivateValue($newEntity, "uuid", UUID::fromRandom());
 
-		$newEntity = Entity::createEntity($entity->getSaveId(), $this->player->getLevel(), $nbt);
-		for($i = 0;$i < 100;$i++){
-			$data = $entity->getDataProperty($i);
-			$type = $entity->getDataPropertyType($i);
-			if($data !== null && $type !== null) $newEntity->setDataProperty($i, $type, $data);
-		}
-		for($i = 0;$i < 50;$i++){
-			$data = $entity->getGenericFlag($i);
-			if($data !== null) $newEntity->setGenericFlag($i, $data);
-		}
-		//$newEntity->setSkin($entity->getSkin());
 		$newEntity->spawnToAll();
 		$this->changeMemory->add(new EntityCreate($location, $newEntity));
 		return $newEntity;
