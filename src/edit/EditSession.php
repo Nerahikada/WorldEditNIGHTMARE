@@ -146,7 +146,7 @@ class EditSession implements Extent{
 		}
 		
 		$newEntity = clone $entity;
-		$newEntity->random = new Random($level->random->nextInt());
+		$newEntity->random = new Random($this->player->getLevel()->random->nextInt());
 		Utils::setPrivateValue($newEntity, "timings", Timings::getEntityTimings($newEntity));
 		Utils::setPrivateValue($newEntity, "id", Entity::$entityCount++);
 		Utils::setPrivateValue($newEntity, "uuid", UUID::fromRandom());
