@@ -121,7 +121,9 @@ class Main extends PluginBase implements Listener{
 
 	public function onLogin(PlayerLoginEvent $event){
 		$player = $event->getPlayer();
-		$this->sessions[$player->getName()] = new EditSession($player);
+		if(!isset($this->sessions[$player->getName()])){
+			$this->sessions[$player->getName()] = new EditSession($player);
+		}
 	}
 
 	public function onInteract(PlayerInteractEvent $event){
