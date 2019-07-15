@@ -144,12 +144,14 @@ class EditSession implements Extent{
 		if($entity instanceof Player){
 			return null;
 		}
-		
+
 		$newEntity = clone $entity;
 		$newEntity->random = new Random($this->player->getLevel()->random->nextInt());
 		Utils::setPrivateValue($newEntity, "timings", Timings::getEntityTimings($newEntity));
+		Utils::setPrivateValue($newEntity, "hasSpawned", []);
 		Utils::setPrivateValue($newEntity, "id", Entity::$entityCount++);
 		Utils::setPrivateValue($newEntity, "uuid", UUID::fromRandom());
+		$newEntity->teleport($location->toVector(), $location->getYaw(), $location->getPitch());
 
 		$newEntity->spawnToAll();
 		$this->changeMemory->add(new EntityCreate($location, $newEntity));
