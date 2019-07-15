@@ -121,8 +121,11 @@ class Main extends PluginBase implements Listener{
 
 	public function onLogin(PlayerLoginEvent $event){
 		$player = $event->getPlayer();
-		if(!isset($this->sessions[$player->getName()])){
+		$session = $this->getEditSession($player);
+		if($session === null){
 			$this->sessions[$player->getName()] = new EditSession($player);
+		}else{
+			$session->setPlayer($player);
 		}
 	}
 
@@ -157,8 +160,8 @@ class Main extends PluginBase implements Listener{
 		}
 	}
 
-	public function getEditSession(Player $player){
-		return $this->sessions[$player->getName()];
+	public function getEditSession(Player $player) : ?EditSession{
+		return $this->sessions[$player->getName()] ?? null;
 	}
 
 	public static function getBlockTrace(Player $player, int $range, bool $useLastBlock = false) : ?WorldVector{
