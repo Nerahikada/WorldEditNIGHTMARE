@@ -60,11 +60,21 @@ use edit\command\SmoothCommand;
 
 class Main extends PluginBase implements Listener{
 
+	const LOGO = "[Edit] ";
+
+	public static $instance;
+
 	public static $wandID = 271;
 	public static $canUseNotOp = false;
 
-	const LOGO = "[Edit] ";
+	public static function getInstance(){
+		return self::$instance;
+	}
 
+	/** @var Config */
+	private $config;
+
+	/** @var EditSessions[] */
 	public $sessions = [];
 
 	public $tools = [];
@@ -76,47 +86,48 @@ class Main extends PluginBase implements Listener{
 
 	public function onEnable(){
 		self::$instance = $this;
-		Server::getInstance()->getLogger()->info("[Edit]§a WorldEditNIGHTMARE_v3.5.4を読み込みました");
-		Server::getInstance()->getPluginManager()->registerEvents($this,  $this);
-		if(!file_exists($this->getDataFolder())) mkdir($this->getDataFolder(), 0744, true);
-		if(!file_exists($this->getDataFolder()."clipboard")) mkdir($this->getDataFolder()."clipboard", 0744, true);
+		$this->getServer()->getLogger()->info(self::LOGO . " §a" . $this->getFullName() . "を読み込みました");
+		$this->getServer()->getPluginManager()->registerEvents($this, $this);
+
 		$this->config = new Config($this->getDataFolder()."config.yml", Config::YAML, [
 			"選択ツール" => 271,
 			"OP以外も使えるようにする" => false
 		]);
+
 		self::$wandID = $this->config->get("選択ツール");
 		self::$canUseNotOp = $this->config->get("OP以外も使えるようにする");
+		
 		$this->patternFactory = new PatternFactory();
 		$this->blockFactory = new BlockFactory();
 		$this->blockRegistry = new LegacyBlockRegistry();
 		new BundledBlockData();
-		Server::getInstance()->getCommandMap()->register("pocketmine", new Pos1Command("/pos1"));
-		Server::getInstance()->getCommandMap()->register("pocketmine", new Pos2Command("/pos2"));
-		Server::getInstance()->getCommandMap()->register("pocketmine", new CopyCommand("/copy"));
-		Server::getInstance()->getCommandMap()->register("pocketmine", new PasteCommand("/paste"));
-		Server::getInstance()->getCommandMap()->register("pocketmine", new CutCommand("/cut"));
-		Server::getInstance()->getCommandMap()->register("pocketmine", new RotateCommand("/rotate"));
-		Server::getInstance()->getCommandMap()->register("pocketmine", new FlipCommand("/flip"));
-		Server::getInstance()->getCommandMap()->register("pocketmine", new BrushCommand("/brush"));
-		Server::getInstance()->getCommandMap()->register("pocketmine", new MaskCommand("/mask"));
-		Server::getInstance()->getCommandMap()->register("pocketmine", new MoveCommand("/move"));
-		Server::getInstance()->getCommandMap()->register("pocketmine", new StackCommand("/stack"));
-		Server::getInstance()->getCommandMap()->register("pocketmine", new CylinderCommand("/cylinder"));
-		Server::getInstance()->getCommandMap()->register("pocketmine", new CylinderCommand("/cyl"));
-		Server::getInstance()->getCommandMap()->register("pocketmine", new HcylinderCommand("/hcylinder"));
-		Server::getInstance()->getCommandMap()->register("pocketmine", new HcylinderCommand("/hcyl"));
-		Server::getInstance()->getCommandMap()->register("pocketmine", new SphereCommand("/sphere"));
-		Server::getInstance()->getCommandMap()->register("pocketmine", new HsphereCommand("/hsphere"));
-		Server::getInstance()->getCommandMap()->register("pocketmine", new PyramidCommand("/pyramid"));
-		Server::getInstance()->getCommandMap()->register("pocketmine", new SetCommand("/set"));
-		Server::getInstance()->getCommandMap()->register("pocketmine", new ReplaceCommand("/replace"));
-		Server::getInstance()->getCommandMap()->register("pocketmine", new OverlayCommand("/overlay"));
-		Server::getInstance()->getCommandMap()->register("pocketmine", new UndoCommand("/undo"));
-		Server::getInstance()->getCommandMap()->register("pocketmine", new RedoCommand("/redo"));
-		Server::getInstance()->getCommandMap()->register("pocketmine", new SmoothCommand("/smooth"));
-	}
 
-	public function onDisable(){
+		$this->getServer()->getCommandMap()->registerAll("worldedit-nightmare", [
+			new Pos1Command("/pos1"),
+			new Pos2Command("/pos2"),
+			new CopyCommand("/copy"),
+			new PasteCommand("/paste"),
+			new CutCommand("/cut"),
+			new RotateCommand("/rotate"),
+			new FlipCommand("/flip"),
+			new BrushCommand("/brush"),
+			new MaskCommand("/mask"),
+			new MoveCommand("/move"),
+			new StackCommand("/stack"),
+			new CylinderCommand("/cylinder"),
+			new CylinderCommand("/cyl"),
+			new HcylinderCommand("/hcylinder"),
+			new HcylinderCommand("/hcyl"),
+			new SphereCommand("/sphere"),
+			new HsphereCommand("/hsphere"),
+			new PyramidCommand("/pyramid"),
+			new SetCommand("/set"),
+			new ReplaceCommand("/replace"),
+			new OverlayCommand("/overlay"),
+			new UndoCommand("/undo"),
+			new RedoCommand("/redo"),
+			new SmoothCommand("/smooth")
+		]);
 	}
 
 	public function onLogin(PlayerLoginEvent $event){
@@ -342,10 +353,4 @@ class Main extends PluginBase implements Listener{
 	public function getBlockRegistry(){
 		return $this->blockRegistry;
 	}
-
-	public static function getInstance(){
-		return self::$instance;
-	}
-
-	public static $instance;
 }
