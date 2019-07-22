@@ -115,17 +115,23 @@ class ForwardExtentCopy implements Operation{
 			$function1 = $this->sourceFunction != null ? new CombinedRegionFunction([$filter, $this->sourceFunction]) : $filter;
 			$blockVisitor = new RegionVisitor($this->region, $function1);
 
-			$this->lastVisitor = $blockVisitor;
-			$this->currentTransform = $this->currentTransform->combine($this->transform);
+			if(!$this->copyingEntities){
+				$this->lastVisitor = $blockVisitor;
+				$this->currentTransform = $this->currentTransform->combine($this->transform);
+
+				return new DelegateOperation($this, $blockVisitor);
+			}
 
 			if($this->copyingEntities){
 				$entityCopy = new ExtentEntityCopy($this->from, $this->destination, $this->to, $this->currentTransform);
 				$entityCopy->setRemoving($this->removingEntities);
 				$entities = $this->source->getEntities($this->region);
 				$entityVisitor = new EntityVisitor($entities, $entityCopy);
+
+				$this->lastVisitor = $entityVisitor;
+				$this->currentTransform = $this->currentTransform->combine($this->transform);
+
 				return new DelegateOperation($this, new OperationQueue([$blockVisitor, $entityVisitor]));
-			}else{
-				return new DelegateOperation($this, $blockVisitor);
 			}
 		}else{
 			return null;
