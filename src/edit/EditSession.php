@@ -12,6 +12,10 @@ use pocketmine\timings\Timings;
 use pocketmine\utils\Random;
 use pocketmine\utils\UUID;
 
+use pocketmine\nbt\tag\DoubleTag;
+use pocketmine\nbt\tag\FloatTag;
+use pocketmine\nbt\tag\ListTag;
+
 use edit\blocks\BaseBlock;
 use edit\blocks\BlockType;
 use edit\command\tool\BrushTool;
@@ -145,15 +149,23 @@ class EditSession implements Extent{
 			return null;
 		}
 
+		$pos = $location->toVector()->toVector3();
 
 		$originalNBT = $entity->namedtag;
 
-		$nbt = Entity::createBaseNBT($location->toVector()->toVector3(), $entity->getMotion(), $location->getYaw(), $location->getPitch());
+		$nbt = Entity::createBaseNBT($pos, $entity->getMotion(), $location->getYaw(), $location->getPitch());
 		$entity->namedtag = $nbt;
 		$entity->saveNBT();
 		$nbt = $entity->namedtag;
 
 		$entity->namedtag = $originalNBT;
+
+		$nbt->setTag(new ListTag("Pos", [
+			new DoubleTag("", $pos->x), new DoubleTag("", $pos->y), new DoubleTag("", $pos->z)
+		]));
+		$nbt->setTag(new ListTag("Rotation", [
+			new FloatTag("", $location->getYaw()), new FloatTag("", $location->getYaw())
+		]));
 
 		$newEntity = Entity::createEntity($nbt->getString("id"), $this->player->getLevel(), $nbt);
 		$newEntity->spawnToAll();
