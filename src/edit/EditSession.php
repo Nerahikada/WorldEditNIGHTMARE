@@ -147,7 +147,7 @@ class EditSession implements Extent{
 		}
 
 		$level = $this->player->getLevel();
-		
+
 		$newEntity = clone $entity;
 
 		Utils::setPrivateValue($newEntity, "hasSpawned", []);
@@ -172,13 +172,17 @@ class EditSession implements Extent{
 		}
 		#################################################################################
 
-		$newEntity->teleport(new Position($location->getX(), $location->getY(), $location->getZ(), $level), $location->getYaw(), $location->getPitch());
-		
 		$newEntity->chunk->addEntity($newEntity);
 		$level->addEntity($newEntity);
 		$newEntity->scheduleUpdate();
 
 		$newEntity->spawnToAll();
+
+		$newEntity->teleport(new Position($location->getX(), $location->getY(), $location->getZ(), $level), $location->getYaw(), $location->getPitch());
+
+		// test
+		$entity->scheduleUpdate();
+
 		$this->changeMemory->add(new EntityCreate($location, $newEntity));
 		return $newEntity;
 	}
