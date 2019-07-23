@@ -148,7 +148,7 @@ class EditSession implements Extent{
 
 		$originalNBT = $entity->namedtag;
 
-		$nbt = Entity::createBaseNBT(new Vector3($location->toVector()->toVector3()), $entity->getMotion(), $location->getYaw(), $location->getPitch());
+		$nbt = Entity::createBaseNBT($location->toVector()->toVector3(), $entity->getMotion(), $location->getYaw(), $location->getPitch());
 		$entity->namedtag = $nbt;
 		$entity->saveNBT();
 		$nbt = $entity->namedtag;
