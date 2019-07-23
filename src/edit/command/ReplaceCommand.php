@@ -46,8 +46,8 @@ class ReplaceCommand extends VanillaCommand{
 			return false;
 		}
 
-		if(DefinedChecker::checkPosition($sender)) {
-			return fasle;
+		if(DefinedChecker::checkPosition($sender)){
+			return false;
 		}
 
 		if(count($args) < 2){
