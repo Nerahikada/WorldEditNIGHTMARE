@@ -5,7 +5,6 @@ namespace edit;
 use pocketmine\block\Block;
 use pocketmine\block\Fallable;
 use pocketmine\level\Level;
-use pocketmine\level\Position;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
 use pocketmine\entity\Entity;
@@ -146,42 +145,18 @@ class EditSession implements Extent{
 			return null;
 		}
 
-		$level = $this->player->getLevel();
 
-		$newEntity = clone $entity;
+		$originalNBT = $entity->namedtag;
 
-		Utils::setPrivateValue($newEntity, "hasSpawned", []);
-		Utils::setPrivateValue($newEntity, "id", Entity::$entityCount++);
-		Utils::setPrivateValue($newEntity, "propertyManager", clone Utils::getPrivateValue($entity, "propertyManager"));
-		$newEntity->chunk = $level->getChunkAtPosition($newEntity, false);
-		Utils::setPrivateValue($newEntity, "blocksAround", []);
-		if(!empty($entity->namedtag) && is_object($entity->namedtag)){
-			$newEntity->namedtag = clone $entity->namedtag;
-		}
-		Utils::setPrivateValue($newEntity, "attributeMap", clone Utils::getPrivateValue($entity, "attributeMap"));
-		Utils::setPrivateValue($newEntity, "closed", false);
-		Utils::setPrivateValue($newEntity, "timings", Timings::getEntityTimings($newEntity));
+		$nbt = Entity::createBaseNBT(new Vector3($location->toVector()->toVector3()), $entity->getMotion(), $location->getYaw(), $location->getPitch());
+		$entity->namedtag = $nbt;
+		$entity->saveNBT();
+		$nbt = $entity->namedtag;
 
-		#################################################################################
-		// WARNING! It's for Altay.
-		if(isset($newEntity->random)){
-			Utils::setPrivateValue($newEntity, "ridingEid", null);
-			Utils::setPrivateValue($newEntity, "riddenByEid", null);
-			$newEntity->random = new Random($level->random->nextInt());
-			Utils::setPrivateValue($newEntity, "uuid", UUID::fromRandom());
-		}
-		#################################################################################
+		$entity->namedtag = $originalNBT;
 
-		$newEntity->chunk->addEntity($newEntity);
-		$level->addEntity($newEntity);
-		$newEntity->scheduleUpdate();
-
+		$newEntity = Entity::createEntity($nbt->getString("id"), $this->player->getLevel(), $nbt);
 		$newEntity->spawnToAll();
-
-		$newEntity->teleport(new Position($location->getX(), $location->getY(), $location->getZ(), $level), $location->getYaw(), $location->getPitch());
-
-		// test
-		$entity->scheduleUpdate();
 
 		$this->changeMemory->add(new EntityCreate($location, $newEntity));
 		return $newEntity;
