@@ -149,23 +149,23 @@ class EditSession implements Extent{
 			return null;
 		}
 
-		$pos = $location->toVector()->toVector3();
-
 		$originalNBT = $entity->namedtag;
+		$originalLocation = $entity->asLocation();
 
-		$nbt = Entity::createBaseNBT($pos, $entity->getMotion(), $location->getYaw(), $location->getPitch());
+		$nbt = Entity::createBaseNBT($location->toVector()->toVector3(), $entity->getMotion(), $location->getYaw(), $location->getPitch());
+		
 		$entity->namedtag = $nbt;
+		$entity->setComponents($location->getX(), $location->getY(), $location->getZ());
+		$entity->yaw = $location->getYaw();
+		$entity->pitch = $location->getPitch();
+
 		$entity->saveNBT();
 		$nbt = $entity->namedtag;
 
 		$entity->namedtag = $originalNBT;
-
-		$nbt->setTag(new ListTag("Pos", [
-			new DoubleTag("", $pos->x), new DoubleTag("", $pos->y), new DoubleTag("", $pos->z)
-		]));
-		$nbt->setTag(new ListTag("Rotation", [
-			new FloatTag("", $location->getYaw()), new FloatTag("", $location->getYaw())
-		]));
+		$entity->setComponents($originalLocation->x, $originalLocation->y, $originalLocation->z);
+		$entity->yaw = $originalLocation->yaw;
+		$entity->pitch = $originalLocation->pitch;
 
 		$newEntity = Entity::createEntity($nbt->getString("id"), $this->player->getLevel(), $nbt);
 		$newEntity->spawnToAll();
