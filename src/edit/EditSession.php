@@ -147,15 +147,33 @@ class EditSession implements Extent{
 		}
 
 		$level = $this->player->getLevel();
+		
 		$newEntity = clone $entity;
-		$newEntity->random = new Random($level->random->nextInt());
-		Utils::setPrivateValue($newEntity, "timings", Timings::getEntityTimings($newEntity));
+
 		Utils::setPrivateValue($newEntity, "hasSpawned", []);
 		Utils::setPrivateValue($newEntity, "id", Entity::$entityCount++);
-		Utils::setPrivateValue($newEntity, "uuid", UUID::fromRandom());
-		Utils::setPrivateValue($newEntity, "closed", false);
-		$newEntity->teleport(new Position($location->getX(), $location->getY(), $location->getZ(), $level), $location->getYaw(), $location->getPitch());
+		Utils::setPrivateValue($newEntity, "propertyManager", clone Utils::getPrivateValue($entity, "propertyManager"));
 		$newEntity->chunk = $level->getChunkAtPosition($newEntity, false);
+		Utils::setPrivateValue($newEntity, "blocksAround", []);
+		if(!empty($entity->namedtag) && is_object($entity->namedtag)){
+			$newEntity->namedtag = clone $entity->namedtag;
+		}
+		Utils::setPrivateValue($newEntity, "attributeMap", clone Utils::getPrivateValue($entity, "attributeMap"));
+		Utils::setPrivateValue($newEntity, "closed", false);
+		Utils::setPrivateValue($newEntity, "timings", Timings::getEntityTimings($newEntity));
+
+		#################################################################################
+		// WARNING! It's for Altay.
+		if(isset($newEntity->random)){
+			Utils::setPrivateValue($newEntity, "ridingEid", null);
+			Utils::setPrivateValue($newEntity, "riddenByEid", null);
+			$newEntity->random = new Random($level->random->nextInt());
+			Utils::setPrivateValue($newEntity, "uuid", UUID::fromRandom());
+		}
+		#################################################################################
+
+		$newEntity->teleport(new Position($location->getX(), $location->getY(), $location->getZ(), $level), $location->getYaw(), $location->getPitch());
+		
 		$newEntity->chunk->addEntity($newEntity);
 		$level->addEntity($newEntity);
 		$newEntity->scheduleUpdate();
