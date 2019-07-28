@@ -57,7 +57,7 @@ class BrushCommand extends VanillaCommand{
 				case "sphere":
 				case "s":
 					if(count($args) < 2){
-						$sender->sendMessage("§c使い方: §a//brush sphere <ブロックパターン> [半径]".
+						$sender->sendMessage("§c使い方: §a//brush sphere <ブロックパターン> [半径]\n".
 								     "§cフラグ: §a-h: 空洞にします");
 						return true;
 					}
@@ -82,7 +82,7 @@ class BrushCommand extends VanillaCommand{
 				case "cyl":
 				case "c":
 					if(count($args) < 2){
-						$sender->sendMessage("§c使い方: §a//brush cylinder <ブロックパターン> [半径] [高さ]".
+						$sender->sendMessage("§c使い方: §a//brush cylinder <ブロックパターン> [半径] [高さ]\n".
 								     "§cフラグ: §a-h: 空洞にします");
 						return true;
 					}
@@ -111,7 +111,7 @@ class BrushCommand extends VanillaCommand{
 					break;
 				case "smooth":
 					if(count($args) < 3){
-						$sender->sendMessage("§c使い方: §a//brush smooth [サイズ] [回数]".
+						$sender->sendMessage("§c使い方: §a//brush smooth [サイズ] [回数]\n".
 								     "§cフラグ: §a-n: 自然のブロックのみに適応します");
 						return true;
 					}
@@ -131,7 +131,7 @@ class BrushCommand extends VanillaCommand{
 				case "gravity":
 				case "grav":
 					if(count($args) < 2){
-						$sender->sendMessage("§c使い方: §a//brush gravity [半径]".
+						$sender->sendMessage("§c使い方: §a//brush gravity [半径]\n".
 								     "§cフラグ: §a-h: 高さ無制限");
 						return true;
 					}
@@ -156,7 +156,7 @@ class BrushCommand extends VanillaCommand{
 					     "§a//brush cylinder: §7円柱を生成します\n".
 					     "§a//brush clipboard: §7クリップボードを貼り付けます\n".
 					     "§a//brush smooth: §7地形を滑らかにします\n".
-					     "§a//brush gravity: §7重力を発生します\n");
+					     "§a//brush gravity: §7重力を発生します");
 		}
 		return true;
 	}

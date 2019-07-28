@@ -8,13 +8,11 @@ use pocketmine\level\Level;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
 use pocketmine\entity\Entity;
-use pocketmine\timings\Timings;
-use pocketmine\utils\Random;
-use pocketmine\utils\UUID;
-
+use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\tag\DoubleTag;
 use pocketmine\nbt\tag\FloatTag;
 use pocketmine\nbt\tag\ListTag;
+use pocketmine\nbt\tag\StringTag;
 
 use edit\blocks\BaseBlock;
 use edit\blocks\BlockType;
@@ -47,7 +45,6 @@ use edit\regions\RegionSelector;
 use edit\regions\Region;
 use edit\session\ClipboardHolder;
 use edit\util\Location;
-use edit\util\Utils;
 
 class EditSession implements Extent{
 
@@ -64,6 +61,8 @@ class EditSession implements Extent{
 	public $history = [];
 	public $historyPointer = -1;
 	public $historyMax = -1;
+
+	public $done = [];
 
 	public function __construct($player){
 		$this->player = $player;
@@ -120,6 +119,7 @@ class EditSession implements Extent{
 			if($k > $this->historyPointer) unset($this->history[$k]);
 		}
 		$this->changeMemory = new ChangeMemory();
+		$this->done = [];
 	}
 
 	public function undo(){
@@ -214,6 +214,8 @@ class EditSession implements Extent{
 
 	public function setBlock(Vector $pt, $pattern) : bool{
 		if(!$this->mask->test($pt)) return false;
+		if(isset($this->done[(($pt->x & 0xFFFFFFF) << 36) | (($pt->y & 0xFF) << 28) | ($pt->z & 0xFFFFFFF)])) return false;
+		else $this->done[(($pt->x & 0xFFFFFFF) << 36) | (($pt->y & 0xFF) << 28) | ($pt->z & 0xFFFFFFF)] = true;
 		if($pattern instanceof Pattern) $pattern = $pattern->apply($pt);
 		$this->changeMemory->add(new BlockChange($pt->toBlockVector(), $this->getBlock($pt), $pattern));
 		if(BlockType::shouldPlaceLast($pattern->getType()) || BlockType::shouldPlaceFinal($pattern->getType())){
