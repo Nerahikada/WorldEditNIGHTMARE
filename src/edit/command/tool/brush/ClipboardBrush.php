@@ -26,7 +26,7 @@ class ClipboardBrush implements Brush{
 		$region = $clipboard->getRegion();
 		$centerOffset = $region->getCenter()->subtract($clipboard->getOrigin());
 
-		$operation = $holder->createPaste($editSession, $editSession->getPlayer()->getLevel())
+		$operation = $this->holder->createPaste($editSession, $editSession->getPlayer()->getLevel())
 				->to($this->usingOrigin ? $position : $position->subtract($centerOffset))
 				->ignoreAirBlocks($this->ignoreAirBlocks)
 				->build();
